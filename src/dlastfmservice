@@ -1,0 +1,3 @@
+#!/bin/bash
+
+twistd -n -r glib2 -y dlastfm.tap

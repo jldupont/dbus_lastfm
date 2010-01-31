@@ -1,0 +1,25 @@
+from dbus.mainloop.glib import DBusGMainLoop
+from twisted.application import internet, service
+from twisted.internet import reactor
+from twisted.python import log
+
+DBusGMainLoop(set_as_default=True)
+
+application = service.Application('dlastfmservice')
+
+class BusLogger(object):
+    def __call__(self, msg):
+        log.msg(msg)
+
+
+## Initializes the Message Bus
+## ===========================
+from dbus_lastfm_service.mbus import Bus
+Bus.logger=BusLogger()
+Bus.debug=True
+
+## Initializes the modules
+## =======================
+import dbus_lastfm_service.user
+import dbus_lastfm_service.api
+
