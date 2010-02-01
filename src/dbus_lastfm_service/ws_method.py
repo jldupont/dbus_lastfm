@@ -4,7 +4,13 @@
     @author: jldupont
     
     Helpers for creating "Method Calls" to Last.fm Web Service
+    
+    Signing: 
+    api_keyxxxxxxxxxxmethodauth.getSessiontokenyyyyyy
+    api signature = md5("api_keyxxxxxxxxxxmethodauth.getSessiontokenyyyyyyilovecher")
+    
 """
+from mbus import Bus
 
 _wsMethod={
     ## ================================================= TRACK
@@ -20,11 +26,6 @@ _wsMethod={
     ,"user.getTopTracks":    {"w":False, "s":False}
 }
 
-class WsMethodBuilder(object):
-    """
-    """
-    def __init__(self):
-        pass
 
 class WsMethod(object):
     """
@@ -46,4 +47,26 @@ class WsMethod(object):
         """
         """
         
+
+class WsMethodHandler(object):
+    """
+    """
+    def __init__(self):
+        pass
+    
+    def h_umethod_call(self, _, (mdic, udic)):
+        """
+        @param mdic: method_call dictionary
+        @param udic: user parameters dictionary
+        """
+        pass
+
+    def h_auth_url(self, _):
+        pass
+
+
+wsh=WsMethodHandler()
+Bus.subscribe("umethod_call", wsh.h_umethod_call)
+Bus.subscribe("auth_url",     wsh.h_auth_url)
+
     

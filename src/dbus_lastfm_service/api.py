@@ -43,14 +43,20 @@ class LastfmApi(dbus.service.Object):
     def setSecretKey(self, secret_key):
         Bus.publish(self, "user_params", {"secret_key":secret_key})
 
-    @dbus.service.method('fm.last.api.account', out_signature="s", async_callbacks=("_callback", "_errback"))
+    ## ================================================================== Authentication
+
+    @dbus.service.method('fm.last.api.account', 
+                         out_signature="s", 
+                         async_callbacks=("_callback", "_errback"))
     def getAuthUrl(self, _callback, _errback):
         """
         Returns an URL pointing to an authorization page
         
         An "authorization token" must first be retrieved from Last.fm
+        and thus the current session (if any) will be lost.
         """
-        pass
+        Bus.publish(self, "auth_url", {"c":_callback, "e":_errback})
+
 
     ## ================================================================== Track interface
 

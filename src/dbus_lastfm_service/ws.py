@@ -18,12 +18,17 @@ class WsFactory(HTTPClientFactory):
 
     This Factory creates a single WsProtocol instance and
     must not be recycled. This behaviour is required because
-    of a limitation stemming from HTTPClientFactory. 
+    of a limitation stemming from HTTPClientFactory.
+    
+    The Response Headers are accessible 
+    through "response_headers".
+    
+    The HTTP status code is "status".
     """
     protocol=HTTPPageGetter
     agent="dbus_lastfm"
     
-    def __init__(self, *p, **k):
+    def __init__(self, ctx, *p, **k):
         """
         @param url
         @param method
@@ -36,28 +41,38 @@ class WsFactory(HTTPClientFactory):
         """
         HTTPClientFactory.__init__(self, *p, agent=self.agent, **k)
         self.finished=False
+        self._ctx=ctx
         
     ## ==================================================  callbacks from WsProtocol
     def noPage(self, failure):
         if self.finished:
             return
+        self.finished=True        
         print ">>> Factory noPage"
-        self.finished=True
+
     
     def page(self, response):
         if self.finished:
             return       
         self.finished=True
         print ">>> Factory page: %s" % ""
-        print self.response_headers
+        print "status: %s" % self.status
     
     def clientConnectionFailed(self, _, reason):
         print ">>> clientConnectionFailed, reason: "+str(reason)
             
+            
+def make_request(ctx, url, method, postdata=None):
+    """
+    Makes a request
+    """
+    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, url, method=method, postdata=postdata)) #@UndefinedVariable
+
+
 ## ============ Test ===============
 
 if __name__=="__main__":
     from twisted.internet import reactor
-    reactor.connectTCP("www.google.ca2", 80, WsFactory("http://www.google.ca/")) #@UndefinedVariable
+    reactor.connectTCP("www.google.ca", 80, WsFactory(None, "http://www.google.ca/")) #@UndefinedVariable
 
     reactor.run() #@UndefinedVariable

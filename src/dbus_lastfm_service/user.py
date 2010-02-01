@@ -16,10 +16,18 @@ class User(object):
     Provides filling user parameters on 
     "method_call" message and produces "umethod_call"
     on the bus in return.
+    
+    Generates the following messages:
+    ================================
+    - "user_params"
+    - "umethod_call"
+
     """
     params=("username"
             ,"api_key"
             ,"secret_key"
+            ,"token"
+            ,"session"
             )
     def _getParams(self, dic={}):
         account=Account()
@@ -31,11 +39,10 @@ class User(object):
     def h_method_call(self, _, cdic):
         """
         Listens for "method_call" messages and
-        fills "cdic" with the missing parameters
+        adds the "user parameters" to a new message
         """
         dic=self._getParams()
-        cdic.update(dic)
-        Bus.publish(self, "umethod_call", cdic)
+        Bus.publish(self, "umethod_call", (cdic, dic))
         
     def q_user_params(self, _):
         """
@@ -44,16 +51,18 @@ class User(object):
         dic=self._getParams()          
         Bus.publish(self, "user_params", dic)
     
-    def a_user_params(self, _, params):
+    def h_user_params(self, _, params):
         """
         Updates the user params
         """
         account=Account()
         account.update(params)
     
+## ========================================================== Bus Interfacing
+    
 user=User()
 Bus.subscribe("user_params?", user.q_user_params)
-Bus.subscribe("user_params",  user.a_user_params)
+Bus.subscribe("user_params",  user.h_user_params)
 Bus.subscribe("method_call",  user.h_method_call)
 
 ## ========================================================== TESTS
