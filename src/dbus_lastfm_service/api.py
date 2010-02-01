@@ -46,7 +46,7 @@ class LastfmApi(dbus.service.Object):
     ## ================================================================== Authentication
 
     @dbus.service.method('fm.last.api.account', 
-                         out_signature="s", 
+                         out_signature="v", 
                          async_callbacks=("_callback", "_errback"))
     def getAuthUrl(self, _callback, _errback):
         """
@@ -67,23 +67,25 @@ class LastfmApi(dbus.service.Object):
                          in_signature="ss", out_signature="v", 
                          async_callbacks=("_callback", "_errback"))
     def getTags(self, artist, track, _callback, _errback):
-        Bus.publish(self, "method_call", {"m:":"track.getTags", "c":_callback, "e":_errback, 
-                                    "a":artist, "t":track})
+        Bus.publish(self, "method_call", {"method":"track.gettags","artist":artist, "track":track}, 
+                                    {"c":_callback, "e":_errback})
         
 
     @dbus.service.method('fm.last.api.track', 
                          in_signature="ssas", out_signature="v", 
                          async_callbacks=("_callback", "_errback"))
     def addTags(self, artist, track, tags, _callback, _errback):
-        Bus.publish(self, "method_call", {"m":"track.addTags", "c":_callback, "e":_errback, 
-                                    "a":artist, "t":track, "tags":tags})
+        Bus.publish(self, "method_call", {"method":"track.addtags",  
+                                    "artist":artist, "track":track, "tags":tags},
+                                    {"c":_callback, "e":_errback})
 
     @dbus.service.method('fm.last.api.track', 
                          in_signature="sss", out_signature="v", 
                          async_callbacks=("_callback", "_errback"))
     def removeTag(self, artist, track, tag, _callback, _errback):
-        Bus.publish(self, "method_call", {"m":"track.removeTag", "c":_callback, "e":_errback, 
-                                    "a":artist, "t":track, "tag":tag})
+        Bus.publish(self, "method_call", {"method":"track.removetag",  
+                                    "artist":artist, "track":track, "tag":tag},
+                                    {"c":_callback, "e":_errback})
 
     
 api=LastfmApi()

@@ -18,6 +18,7 @@ class Account(object):
         return client.get_string(self.BASE+str(name))
 
     def __setattr__(self, name, value):
+        value="" if value is None else value 
         client=gconf.client_get_default()
         client.set_string(self.BASE+str(name), value)
 

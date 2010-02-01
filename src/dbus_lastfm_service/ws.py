@@ -10,7 +10,8 @@
 """
 
 from twisted.web.client import HTTPPageGetter, HTTPClientFactory
-
+from twisted.internet import reactor
+from mbus import Bus
 
 class WsFactory(HTTPClientFactory):
     """
@@ -48,31 +49,39 @@ class WsFactory(HTTPClientFactory):
         if self.finished:
             return
         self.finished=True        
-        print ">>> Factory noPage"
+        Bus.publish(self, "log", "nopage!")
+        (m, cdic, _)=self._ctx
+        errback=cdic["e"]
+        errback("no page for method: %s" % m)
 
     
     def page(self, response):
         if self.finished:
             return       
         self.finished=True
-        print ">>> Factory page: %s" % ""
-        print "status: %s" % self.status
+        Bus.publish(self, "log", "response: %s" % response)
+        (_m, cdic, _)=self._ctx
+        cb=cdic["c"]
+        cb(response)
     
     def clientConnectionFailed(self, _, reason):
         print ">>> clientConnectionFailed, reason: "+str(reason)
             
             
-def make_request(ctx, url, method, postdata=None):
+def make_ws_request(ctx, url, http_method, postdata=None):
     """
     Makes a request
+    @param ctx: context of request - parameter useful for processing a Response
+    @param url: URL for making the request
+    @param http_method: HTTP method e.g. GET, POST
     """
-    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, url, method=method, postdata=postdata)) #@UndefinedVariable
+    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, url, method=http_method, postdata=postdata)) #@UndefinedVariable
 
 
 ## ============ Test ===============
 
 if __name__=="__main__":
-    from twisted.internet import reactor
+
     reactor.connectTCP("www.google.ca", 80, WsFactory(None, "http://www.google.ca/")) #@UndefinedVariable
 
     reactor.run() #@UndefinedVariable
