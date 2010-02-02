@@ -25,10 +25,13 @@ class Bus(object):
     ftable={}
 
     @classmethod
-    def _maybeLog(cls, msg):
+    def _maybeLog(cls, msgType, msg):
         """
         Private - Logging helper
         """
+        if msgType=="log":
+            return
+        
         if cls.logger:
             cls.logger(msg)
     
@@ -41,7 +44,7 @@ class Bus(object):
         @param callback: callable instance which will be called upon message delivery  
         """
         try:
-            cls._maybeLog("subscribe: subscriber(%s) msgType(%s)" % (callback.__self__, msgType))
+            cls._maybeLog(msgType, "subscribe: subscriber(%s) msgType(%s)" % (callback.__self__, msgType))
             subs=cls.ftable.get(msgType, [])
             subs.append((callback.__self__, callback))
             cls.ftable[msgType]=subs
@@ -58,7 +61,7 @@ class Bus(object):
         @param **kwa: keyword based arguments
         """
         if cls.debug:
-            cls._maybeLog("publish: caller(%s) type(%s) pa(%s) kwa(%s)" % (caller, msgType, pa, kwa))
+            cls._maybeLog(msgType, "publish: caller(%s) type(%s) pa(%s) kwa(%s)" % (caller, msgType, pa, kwa))
         subs=cls.ftable.get(msgType, [])
         for (sub, cb) in subs:
             if sub==caller:  ## don't send to self

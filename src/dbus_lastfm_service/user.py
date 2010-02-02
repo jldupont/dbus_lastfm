@@ -26,8 +26,8 @@ class User(object):
     params=("username"
             ,"api_key"
             ,"secret_key"
+            ,"auth_token"
             ,"token"
-            ,"session"
             )
     def _getParams(self, dic={}):
         account=Account()

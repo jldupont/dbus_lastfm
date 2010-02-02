@@ -49,7 +49,7 @@ class WsFactory(HTTPClientFactory):
         if self.finished:
             return
         self.finished=True        
-        Bus.publish(self, "log", "nopage!")
+        #Bus.publish(self, "log", "nopage!")
         (m, cdic, _)=self._ctx
         errback=cdic["e"]
         errback(["error", "no_page", "no page for method: %s" % m])
@@ -59,7 +59,7 @@ class WsFactory(HTTPClientFactory):
         if self.finished:
             return       
         self.finished=True
-        Bus.publish(self, "log", "response: %s" % response)
+        #Bus.publish(self, "log", "response: %s" % response)
         Bus.publish(self, "ws_response", (self.status, self.response_headers, self._ctx, response))
     
     def clientConnectionFailed(self, _, reason):
@@ -75,7 +75,7 @@ def make_ws_request(ctx, url, http_method, postdata=None):
     @param url: URL for making the request
     @param http_method: HTTP method e.g. GET, POST
     """
-    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, url, method=http_method, postdata=postdata)) #@UndefinedVariable
+    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata)) #@UndefinedVariable
 
 
 ## ============ Test ===============

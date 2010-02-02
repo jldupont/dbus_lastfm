@@ -19,36 +19,75 @@ class WsResponseHandler(object):
         Response handler
         """
         (method, cdic, udic)=ctx
+        
+        ## Special case for the "authentication flow"
+        if method=="auth.getToken":
+            return self.h_auth_gettoken(status, response_headers, cdic, udic, response)
+
+        if method=="auth.getSession":
+            return self.h_auth_getsession(status, response_headers, cdic, udic, response)
+        
         if status!='200':
             cdic["e"](["error", "method_failed", "Method Call failed (%s)" % method])
             return
-        
-        ## Special case for the "authentication flow"
-        if method=="auth.gettoken":
-            return self.h_auth_gettoken(response_headers, cdic, udic, response)
-        
-        Bus.publish(self, "log", "response: status: %s, text: %s" % (status, response))
 
-    def h_auth_gettoken(self, response_headers, cdic, udic, response):
+        ## Actually return a response to the API caller
+        cdic["c"](["ok", response])
+        
+    def h_auth_getsession(self, status, response_headers, cdic, udic, response):
         """
+        Return from "getsession" - part of authentication flow
         """
+        Bus.publish(self, "log", "h_auth_getsession, status: %s" % status)
+        
+        if status!="200":
+            cdic["e"](["error", "method_failed", "Cannot retrieve 'session token' from Last.fm"])
+            return
+        
+        if not response:
+            cdic["e"](["error", "invalid_response", "Invalid response received from Last.fm"])
+            return
+        
+        match=re.search("\<key\>(.*)\<\/key\>", response)
+        if match is None:
+            cdic["e"](["error", "token_missing", "Missing 'session token' from Last.fm response"])
+            return
+
+        ## We've got a "session token" ...
+        ##  Now we need to complete the original method call
+        token=match.group(1)
+        Bus.publish(self, "user_params", {"token":token})        
+        
+        orig_mdic=cdic["original_mdic"]
+        Bus.publish(self, "method_call", orig_mdic, cdic) # get rid of original_cdic?
+        
+
+    def h_auth_gettoken(self, status, response_headers, cdic, udic, response):
+        """
+        Authentication flow
+        """
+        Bus.publish(self, "log", "h_auth_gettoken, status: %s" % status)
+        
+        if status!="200":
+            cdic["e"](["error", "method_failed", "Cannot retrieve 'auth token' from Last.fm"])
+            return
+            
         if not response:
             cdic["e"](["error", "invalid_response", "Invalid response received from Last.fm"])
             return
             
         match=re.search("\<token\>(.*)\<\/token\>", response)
         if match is None:
-            cdic["e"](["error", "token_missing", "Missing 'token' from Last.fm response"])
+            cdic["e"](["error", "token_missing", "Missing 'auth token' from Last.fm response"])
             return
         
-        token=match.group(1)
-        Bus.publish(self, "user_params", {"token":token})        
+        auth_token=match.group(1)
+        Bus.publish(self, "user_params", {"auth_token":auth_token, "token":""})        
         
-        ## No need to "ask" for the "user parameters" because
-        ## if we got here in the first place that means we already
-        ## grab those
         api_key=udic.get("api_key", "")
-        url=self.auth_url % (api_key, token)
+        
+        ## Return URL that must be used by the user for authentication
+        url=self.auth_url % (api_key, auth_token)
         cdic["c"](["ok", url])
 
    
