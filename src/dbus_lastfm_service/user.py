@@ -54,6 +54,7 @@ class User(object):
         """
         Updates the user params
         """
+        Bus.publish(self, "log", "h_user_params, params: %s" % params)
         account=Account()
         account.update(params)
     

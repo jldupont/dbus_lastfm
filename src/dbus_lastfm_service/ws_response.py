@@ -59,7 +59,10 @@ class WsResponseHandler(object):
         Bus.publish(self, "user_params", {"token":token})        
         
         orig_mdic=cdic["original_mdic"]
-        Bus.publish(self, "method_call", orig_mdic, cdic) # get rid of original_cdic?
+        
+        # get rid of original_mdic in cdic
+        del cdic["original_mdic"]
+        Bus.publish(self, "method_call", orig_mdic, cdic) 
         
 
     def h_auth_gettoken(self, status, response_headers, cdic, udic, response):

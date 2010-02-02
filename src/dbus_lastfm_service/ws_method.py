@@ -115,16 +115,18 @@ class WsMethod(object):
             m=md5()
             m.update(tsign)
             api_sig=m.hexdigest()
-            dic["api_sig"]=api_sig
-            #Bus.publish(self, "log", "tosign(%s) api_sig: %s" % (tsign, api_sig))
+            Bus.publish(self, "log", "tosign(%s)" % tsign)
                         
+        ## We do not want to update 'dic' with 'api_sig'
+        ## ---------------------------------------------
         self.url=self.API+"?"
         for key in dic:
-            if key=="token":
-                continue
             self.url+=key+"="+urllib.quote(dic[key])+"&"
+            
+        if self.srequired or self.method=="auth.getSession":
+            self.url+="api_sig="+str(api_sig)
+            
         self.url=self.url.strip("&")
-        
         
         
 
@@ -179,4 +181,5 @@ class WsMethodHandler(object):
 wsh=WsMethodHandler()
 Bus.subscribe("umethod_call", wsh.h_umethod_call)
 
-# "depeche mode", "little 15"
+## Test string for 'track.getTags'
+#"depeche mode", "little 15"
