@@ -10,6 +10,7 @@ from hashlib import md5
 from mbus import Bus
 from ws import make_ws_request
 import urllib
+import dbus
 
 _wsMethod={
     ## ================================================= AUTHEN
@@ -29,6 +30,9 @@ _wsMethod={
     ,"user.getTopTracks":    {"w":False, "s":False}
 }
 
+_wsMethodChecks = {
+    "track.addTags": { "_tocheck": ["tags"], "tags":{"type": dbus.Array, "max_count":10} }
+}
 
 class WsMethod(object):
     """
@@ -54,8 +58,41 @@ class WsMethod(object):
         self.body=None
         
         self._preprocess()
-        if not self._error:
-            self._process()
+        if self._error:
+            return
+        
+        if not self._performChecks():
+            return
+        
+        self._process()
+
+    def _performChecks(self):
+        """
+        Performs access checks e.g. maximum number of items in list
+        
+        """
+        lcheck=_wsMethodChecks.get(self.method, None)
+        if not lcheck:
+            return True
+        
+        pcheck=lcheck["_tocheck"]
+        for pkey in pcheck:
+            pvalue=self.mdic.get(pkey, None)
+            if not pvalue:
+                self._error=["missing_parameter", "parameter(%s)" % pkey]
+                return False
+            ## checks associated with a method parameter
+            kcheck=lcheck[pkey]
+            t=kcheck["type"]
+            if type(pvalue) != t:
+                self._error=["wrong_type", "parameter(%s) expected to be of type(%s)" % (pkey, str(t))]
+                return False
+            if t==dbus.Array:
+                maxcount=kcheck["max_count"]
+                if len(pvalue) > maxcount:
+                    self._error=["too_long", "parameter(%s) expected to be shorter than %s" % (pkey, maxcount)]
+                    return False
+        return True
 
     def session_required(self):
         """
@@ -110,24 +147,45 @@ class WsMethod(object):
             secret=self.udic.get("secret_key", "")  
             keys=sorted(dic.keys())
             for key in keys:
-                tsign += key+self.mdic[key]
+                value=self.mdic[key]
+                if type(value)==dbus.Array:
+                    liste=""
+                    for item in value:
+                        liste=item+","
+                    value=liste.strip(",")
+                tsign += key+value
             tsign+=secret.strip()
             m=md5()
             m.update(tsign)
             api_sig=m.hexdigest()
             Bus.publish(self, "log", "tosign(%s)" % tsign)
+            
+        # "depeche mode","little 15", ["electronica"]
+        fragment=""
+        for key in dic:
+            value=dic[key]
+            if type(value) == dbus.Array:
+                liste=""
+            
+                for item in value:
+                    liste=str(item)+","
+                value=liste.strip(",")
+                #Bus.publish(self, "log", "Exception: %s" % e)
+                
+            fragment+=key+"="+urllib.quote(value)+"&"
+            
+        if self.srequired or self.method=="auth.getSession":
+            fragment+="api_sig="+str(api_sig)
+        fragment=fragment.strip("&")
                         
         ## We do not want to update 'dic' with 'api_sig'
         ## ---------------------------------------------
-        self.url=self.API+"?"
-        for key in dic:
-            self.url+=key+"="+urllib.quote(dic[key])+"&"
-            
-        if self.srequired or self.method=="auth.getSession":
-            self.url+="api_sig="+str(api_sig)
-            
-        self.url=self.url.strip("&")
-        
+        if self.wmethod:
+            self.url=self.API
+            self.body=fragment
+        else:
+            self.url=self.API+"?"+fragment
+            self.body=None
         
 
 class WsMethodHandler(object):
@@ -145,7 +203,7 @@ class WsMethodHandler(object):
         #Bus.publish(self, "log", "h_umethod_call: mdic: %s cdic: %s udic: %s" % (mdic, cdic, udic))
         
         ws_method=WsMethod(mdic, udic)
-        Bus.publish(self, "log", "h_umethod_call: method(%s) cdic: %s" % (ws_method.method, cdic))
+        Bus.publish(self, "log", "h_umethod_call: method(%s) http_method(%s) body(%s)" % (ws_method.method, ws_method.http_method, ws_method.body))
         
         if not ws_method.is_error():
             if not ws_method.method=="auth.getSession":
@@ -159,7 +217,7 @@ class WsMethodHandler(object):
             return       
         
         ctx=(ws_method.method, cdic, udic)        
-        make_ws_request(ctx, ws_method.url, http_method=ws_method.http_method)        
+        make_ws_request(ctx, ws_method.url, http_method=ws_method.http_method, postdata=ws_method.body)        
         
     def _session_required_flow(self, mdic, cdic, udic):
         """

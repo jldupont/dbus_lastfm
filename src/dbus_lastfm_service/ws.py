@@ -68,13 +68,14 @@ class WsFactory(HTTPClientFactory):
         errback(["error", "conn_error", "connection failed"])
             
             
-def make_ws_request(ctx, url, http_method, postdata=None):
+def make_ws_request(ctx, url, http_method="GET", postdata=None):
     """
     Makes a request
     @param ctx: context of request - parameter useful for processing a Response
     @param url: URL for making the request
     @param http_method: HTTP method e.g. GET, POST
     """
+    #Bus.publish(None, "log", "make_ws_request: http_method(%s) postdata(%s)" % (http_method, postdata))
     reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata)) #@UndefinedVariable
 
 
