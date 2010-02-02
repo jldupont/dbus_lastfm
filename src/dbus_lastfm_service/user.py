@@ -35,15 +35,6 @@ class User(object):
             dic[key]=account[key]
         return dic
 
-    def h_auth_url(self, _, cdic):
-        """
-        Listens for "auth_url" messages and
-        adds the "user parameters" to a new message
-        """
-        dic=self._getParams()
-        Bus.publish(self, "uauth_url", (cdic, dic))
-        
-    
     def h_method_call(self, _, mdic, cdic):
         """
         Listens for "method_call" messages and
@@ -72,7 +63,6 @@ user=User()
 Bus.subscribe("user_params?", user.q_user_params)
 Bus.subscribe("user_params",  user.h_user_params)
 Bus.subscribe("method_call",  user.h_method_call)
-Bus.subscribe("auth_url",     user.h_auth_url)
 
 ## ========================================================== TESTS
 

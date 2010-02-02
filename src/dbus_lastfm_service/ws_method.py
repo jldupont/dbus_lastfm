@@ -5,18 +5,17 @@
     
     Helpers for creating "Method Calls" to Last.fm Web Service
     
-    Signing: 
-    api_keyxxxxxxxxxxmethodauth.getSessiontokenyyyyyy
-    api signature = md5("api_keyxxxxxxxxxxmethodauth.getSessiontokenyyyyyyilovecher")
-    
 """
 from hashlib import md5
 from mbus import Bus
 from ws import make_ws_request
 
 _wsMethod={
+    ## ================================================= AUTHEN
+    "auth.gettoken":        {"w":False, "s":False}
+    
     ## ================================================= TRACK
-     "track.addtags":       {"w":True,  "s":True}
+    ,"track.addtags":       {"w":True,  "s":True}
     ,"track.gettags":       {"w":False, "s":True}
     ,"track.removetag":     {"w":True,  "s":True}
     
@@ -31,7 +30,7 @@ _wsMethod={
 
 class WsMethod(object):
     """
-    
+    Prepares a Last.fm API method
     """
     API="http://ws.audioscrobbler.com/2.0/"
     HOST="ws.audioscrobbler.com"
@@ -46,6 +45,10 @@ class WsMethod(object):
         self.mdic=mdic
         self.udic=udic
         
+        if wmethod:
+            self.http_method="POST"
+        else:
+            self.http_method="GET"
         self.url=None
         self.body=None
         
@@ -53,6 +56,11 @@ class WsMethod(object):
 
     def _process(self):
         """
+        Actually builds the URL used for making
+        the API method call
+        
+        If the method_call requires authentication (i.e. a "session"),
+        'api_sig' is generated.
         """
         dic=self.mdic
         dic["api_key"]=self.udic.get("api_key","")
@@ -71,12 +79,14 @@ class WsMethod(object):
         for key in dic:
             self.url+=key+"="+dic[key]+"&"
         self.url=self.url.strip("&")
-        Bus.publish(self, "log", "url: %s" % self.url)
+        #Bus.publish(self, "log", "url: %s" % self.url)
         
         
 
 class WsMethodHandler(object):
     """
+    Handler for API requests that need
+    to be sent off to Last.fm
     """
     def __init__(self):
         pass
@@ -87,30 +97,22 @@ class WsMethodHandler(object):
         @param cdic: callback dictionary
         @param udic: user parameters dictionary
         """
-        method=mdic.get("method", None)
+        method=mdic.get("method", "")
         mdetails=_wsMethod.get(method, None)
         if not mdetails:
             errback=cdic["e"]
-            errback("unknown method: %s" + method)
+            errback(["error", "unsupported_method", "unknown method: %s" + method])
             return
-        
-
-    def h_uauth_url(self, _, (cdic, udic)):
-        """
-        Start an authentication flow - clear any existing session
-        
-        @param cdic: context dictionary i.e. callback & errback
-        @param udic: user parameters dictionary
-        """
-        Bus.publish(self, "user_params", {"token":None, "session":None})
-        method=WsMethod("auth.gettoken", False, {"method":"auth.gettoken"}, udic)
-        ctx=("auth_url", cdic, udic)
-        make_ws_request(ctx, method.url, http_method="GET")
+        wmethod=mdetails.get("w", False)
+        srequired=mdetails.get("s", False)
+       
+        ws_method=WsMethod(wmethod, srequired, {"method":method}, udic)
+        ctx=(method, cdic, udic)        
+        make_ws_request(ctx, ws_method.url, http_method=ws_method.http_method)        
         
 
 
 wsh=WsMethodHandler()
 Bus.subscribe("umethod_call", wsh.h_umethod_call)
-Bus.subscribe("uauth_url",    wsh.h_uauth_url)
 
     

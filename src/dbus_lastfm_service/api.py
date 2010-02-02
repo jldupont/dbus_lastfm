@@ -55,7 +55,8 @@ class LastfmApi(dbus.service.Object):
         An "authorization token" must first be retrieved from Last.fm
         and thus the current session (if any) will be lost.
         """
-        Bus.publish(self, "auth_url", {"c":_callback, "e":_errback})
+        Bus.publish(self, "method_call", {"method":"auth.gettoken"}, 
+                    {"c":_callback, "e":_errback})
 
 
     ## ================================================================== Track interface

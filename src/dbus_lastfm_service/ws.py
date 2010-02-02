@@ -52,7 +52,7 @@ class WsFactory(HTTPClientFactory):
         Bus.publish(self, "log", "nopage!")
         (m, cdic, _)=self._ctx
         errback=cdic["e"]
-        errback("no page for method: %s" % m)
+        errback(["error", "no_page", "no page for method: %s" % m])
 
     
     def page(self, response):
@@ -60,12 +60,12 @@ class WsFactory(HTTPClientFactory):
             return       
         self.finished=True
         Bus.publish(self, "log", "response: %s" % response)
-        (_m, cdic, _)=self._ctx
-        cb=cdic["c"]
-        cb(response)
+        Bus.publish(self, "ws_response", (self.status, self.response_headers, self._ctx, response))
     
     def clientConnectionFailed(self, _, reason):
-        print ">>> clientConnectionFailed, reason: "+str(reason)
+        (_, cdic, _)=self._ctx
+        errback=cdic["e"]
+        errback(["error", "conn_error", "connection failed"])
             
             
 def make_ws_request(ctx, url, http_method, postdata=None):
@@ -83,5 +83,5 @@ def make_ws_request(ctx, url, http_method, postdata=None):
 if __name__=="__main__":
 
     reactor.connectTCP("www.google.ca", 80, WsFactory(None, "http://www.google.ca/")) #@UndefinedVariable
-
     reactor.run() #@UndefinedVariable
+    

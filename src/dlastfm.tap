@@ -16,7 +16,7 @@ class BusLogger(object):
 ## ===========================
 from dbus_lastfm_service.mbus import Bus
 Bus.logger=BusLogger()
-#Bus.debug=True
+Bus.debug=True
 
 ## Initializes the modules
 ## =======================
@@ -24,3 +24,4 @@ import dbus_lastfm_service.user
 import dbus_lastfm_service.api
 import dbus_lastfm_service.logger
 import dbus_lastfm_service.ws_method
+import dbus_lastfm_service.ws_response
