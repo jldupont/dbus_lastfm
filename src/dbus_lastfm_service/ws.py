@@ -49,7 +49,7 @@ class WsFactory(HTTPClientFactory):
         if self.finished:
             return
         self.finished=True        
-        #Bus.publish(self, "log", "nopage!")
+        Bus.publish(self, "log", "failure: %s" % failure)
         (m, cdic, _)=self._ctx
         errback=cdic["e"]
         errback(["error", "no_page", "no page for method: %s" % m])
@@ -76,7 +76,10 @@ def make_ws_request(ctx, url, http_method="GET", postdata=None):
     @param http_method: HTTP method e.g. GET, POST
     """
     #Bus.publish(None, "log", "make_ws_request: http_method(%s) postdata(%s)" % (http_method, postdata))
-    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata)) #@UndefinedVariable
+    if http_method=="POST":
+        reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata, headers={"Content-Type":"application/x-www-form-urlencoded"})) #@UndefinedVariable
+    else:
+        reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata)) #@UndefinedVariable
 
 
 ## ============ Test ===============
