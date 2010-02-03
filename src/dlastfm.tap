@@ -1,3 +1,8 @@
+"""
+	DBusLastfm
+	
+	@author: Jean-Lou Dupont
+"""
 from dbus.mainloop.glib import DBusGMainLoop
 from twisted.application import internet, service
 from twisted.internet import reactor
@@ -21,7 +26,11 @@ Bus.logger=BusLogger()
 ## Initializes the modules
 ## =======================
 import dbus_lastfm_service.user
-import dbus_lastfm_service.api
+#import dbus_lastfm_service.api
+import dbus_lastfm_service.api.account
+import dbus_lastfm_service.api.track
 import dbus_lastfm_service.logger
 import dbus_lastfm_service.ws_method
 import dbus_lastfm_service.ws_response
+
+import dbus_lastfm

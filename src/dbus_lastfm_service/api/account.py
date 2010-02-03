@@ -1,20 +1,19 @@
 """
-    DBus based API
+    DBus based API - Account
     @author: jldupont
 """
 import dbus.service
-#from twisted.python import log
 
-from mbus import Bus
+from dbus_lastfm_service.mbus import Bus
 
 
-class LastfmApi(dbus.service.Object):
+class DbusApiAccount(dbus.service.Object):
     """
     API - mixin pattern
     """
     def __init__(self):
         bus_name = dbus.service.BusName('fm.lastfm.api', bus=dbus.SessionBus())
-        dbus.service.Object.__init__(self, bus_name, '/')
+        dbus.service.Object.__init__(self, bus_name, '/account')
         self._cache={}
         
     ## ================================================================ Bus interface
@@ -65,35 +64,7 @@ class LastfmApi(dbus.service.Object):
         """
         Bus.publish(self, "user_params", {"auth_token":"", "token":""})
 
-    ## ================================================================== Track interface
-
-    ## Return Response Code e.g. 200
-    ## Return Response Headers 
-
-    @dbus.service.method('fm.last.api.track', 
-                         in_signature="ss", out_signature="v", 
-                         async_callbacks=("_callback", "_errback"))
-    def getTags(self, artist, track, _callback, _errback):
-        Bus.publish(self, "method_call", {"method":"track.getTags","artist":artist, "track":track}, 
-                                    {"c":_callback, "e":_errback})
-        
-
-    @dbus.service.method('fm.last.api.track', 
-                         in_signature="ssas", out_signature="v", 
-                         async_callbacks=("_callback", "_errback"))
-    def addTags(self, artist, track, tags, _callback, _errback):
-        Bus.publish(self, "method_call", {"method":"track.addTags",  
-                                    "artist":artist, "track":track, "tags":tags},
-                                    {"c":_callback, "e":_errback})
-
-    @dbus.service.method('fm.last.api.track', 
-                         in_signature="sss", out_signature="v", 
-                         async_callbacks=("_callback", "_errback"))
-    def removeTag(self, artist, track, tag, _callback, _errback):
-        Bus.publish(self, "method_call", {"method":"track.removeTag",  
-                                    "artist":artist, "track":track, "tag":tag},
-                                    {"c":_callback, "e":_errback})
 
     
-api=LastfmApi()
+api=DbusApiAccount()
 Bus.subscribe("user_params", api._snif_user_params)
