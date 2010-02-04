@@ -5,6 +5,7 @@
   <object class="GtkWindow" id="wconfig">
     <property name="title" translatable="yes">DBus Lastfm Configuration</property>
     <property name="window_position">mouse</property>
+    <property name="deletable">False</property>
     <child>
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -147,13 +148,13 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="bquit">
-                    <property name="label" translatable="yes">Quit</property>
+                  <object class="GtkButton" id="bapply">
+                    <property name="label" translatable="yes">Apply</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="xalign">0.56000000238418579</property>
-                    <signal name="clicked" handler="on_bquit_clicked"/>
+                    <signal name="clicked" handler="on_bapply_clicked"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
