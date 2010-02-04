@@ -142,6 +142,8 @@ class WsMethod(object):
             dic["sk"]=self.udic.get("token", "MISSING_SESSION_TOKEN")
         
         dic["api_key"]=self.udic.get("api_key","")
+        
+        ## Signing
         tsign=""
         if self.srequired or self.method=="auth.getSession":
             secret=self.udic.get("secret_key", "")  
@@ -160,17 +162,15 @@ class WsMethod(object):
             api_sig=m.hexdigest()
             Bus.publish(self, "log", "tosign(%s)" % tsign)
             
-        # "depeche mode","little 15", ["electronica"]
+        ## URL formatting / POST body formatting
         fragment=""
         for key in dic:
             value=dic[key]
             if type(value) == dbus.Array:
                 liste=""
-            
                 for item in value:
                     liste=str(item)+","
                 value=liste.strip(",")
-                #Bus.publish(self, "log", "Exception: %s" % e)
                 
             fragment+=key+"="+urllib.quote(value)+"&"
             
@@ -179,7 +179,8 @@ class WsMethod(object):
         fragment=fragment.strip("&")
                         
         ## We do not want to update 'dic' with 'api_sig'
-        ## ---------------------------------------------
+        ## Do not add keys which would pollute unneccessarily
+        ## --------------------------------------------------
         if self.wmethod:
             self.url=self.API
             self.body=fragment
@@ -200,10 +201,9 @@ class WsMethodHandler(object):
         @param cdic: callback dictionary
         @param udic: user parameters dictionary
         """
-        #Bus.publish(self, "log", "h_umethod_call: mdic: %s cdic: %s udic: %s" % (mdic, cdic, udic))
-        
         ws_method=WsMethod(mdic, udic)
-        Bus.publish(self, "log", "h_umethod_call: method(%s) http_method(%s) body(%s)" % (ws_method.method, ws_method.http_method, ws_method.body))
+        #Bus.publish(self, "log", "h_umethod_call: method(%s) http_method(%s) body(%s)" % 
+        #            (ws_method.method, ws_method.http_method, ws_method.body))
         
         if not ws_method.is_error():
             if not ws_method.method=="auth.getSession":
@@ -212,8 +212,7 @@ class WsMethodHandler(object):
                     return
         
         if ws_method.is_error():
-            errback=cdic["e"]
-            errback(["error", ws_method.get_error()])
+            cdic["e"](["error", ws_method.get_error()])
             return       
         
         ctx=(ws_method.method, cdic, udic)        
@@ -225,7 +224,7 @@ class WsMethodHandler(object):
         
         We need to have a "token" as starting point 
         """
-        Bus.publish(self, "log", "_session_required_flow: mdic(%s)" % mdic)
+        #Bus.publish(self, "log", "_session_required_flow: mdic(%s)" % mdic)
         
         auth_token=udic.get("auth_token", "")
         if not auth_token: 

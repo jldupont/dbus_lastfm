@@ -29,12 +29,14 @@ class User(object):
             ,"auth_token"
             ,"token"
             )
-    def _getParams(self, dic={}):
-        account=Account()
-        for key in self.params:
-            dic[key]=account[key]
-        return dic
-
+    
+    ## Parameters that influence the validity
+    ## of a user session
+    rootParams = ("api_key"
+                  ,"secret_key"
+                  )
+    ## =========================================================== HANDLERS
+    
     def h_method_call(self, _, mdic, cdic):
         """
         Listens for "method_call" messages and
@@ -43,7 +45,7 @@ class User(object):
         dic=self._getParams()
         Bus.publish(self, "umethod_call", (mdic, cdic, dic))
         
-    def q_user_params(self, _):
+    def q_user_params(self, _=None):
         """
         Responder for the question "user_params?"
         """
@@ -54,9 +56,34 @@ class User(object):
         """
         Updates the user params
         """
-        Bus.publish(self, "log", "h_user_params, params: %s" % params)
+        #Bus.publish(self, "log", "h_user_params, params: %s" % params)
+        self._updateParams(params)
+        self._dependencyChecks(params)
+
+    ## =========================================================== Helpers
+
+    def _getParams(self, dic={}):
         account=Account()
-        account.update(params)
+        for key in self.params:
+            dic[key]=account[key]
+        return dic
+        
+    def _updateParams(self, iparams):
+        account=Account()
+        account.update(iparams)
+        
+    def _dependencyChecks(self, iparams):
+        """
+        Performs 'dependency checks' of the received
+        parameters against the 'root parameters'
+        """
+        for key in iparams:
+            if key in self.rootParams:
+                self._updateParams({"auth_token":"", "token":""})
+                self.q_user_params()
+                break
+            
+        
     
 ## ========================================================== Bus Interfacing
     

@@ -22,16 +22,29 @@ Account related
 
 Interface: fm.last.api.account
 Methods: 
+
  - getUsername() -> (String username)
  - setUsername( String username )
  - setApiKey( String api_key )
  - setSecretKey( String secret_key )
+ - clearSession()
+ - authUrl() -> (String URL)
 
 Track related
 -------------
 
 Interface: fm.last.api.track
-Methods: 
+Methods:
+ 
  - getTags( String artist, String track )
  - addTags( String artist, String track, String[] tags )
  - removeTag( String artist, String track, String tag )
+
+ 
+Dependency
+==========
+
+- `python-notify` Ubuntu package
+- GTK+
+- >= Python 2.6.x, < 3.0
+  

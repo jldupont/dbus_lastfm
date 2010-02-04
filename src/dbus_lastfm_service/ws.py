@@ -42,30 +42,27 @@ class WsFactory(HTTPClientFactory):
         """
         HTTPClientFactory.__init__(self, *p, agent=self.agent, **k)
         self.finished=False
-        self._ctx=ctx
+        (self.method, self.cdic, _) = ctx
+        self.eback=self.cdic["e"]
+        ##self.cback=self.cdic["c"]
         
     ## ==================================================  callbacks from WsProtocol
     def noPage(self, failure):
         if self.finished:
             return
         self.finished=True        
-        Bus.publish(self, "log", "failure: %s" % failure)
-        (m, cdic, _)=self._ctx
-        errback=cdic["e"]
-        errback(["error", "no_page", "no page for method: %s" % m])
-
+        self.eback(["error", "no_page", "no page for method(%s), HTTP status(%s)" % (self.method, self.status)])
+        Bus.publish(self, "error", ["api_access_error", {"status":self.status}])
     
     def page(self, response):
         if self.finished:
             return       
         self.finished=True
-        #Bus.publish(self, "log", "response: %s" % response)
         Bus.publish(self, "ws_response", (self.status, self.response_headers, self._ctx, response))
     
     def clientConnectionFailed(self, _, reason):
-        (_, cdic, _)=self._ctx
-        errback=cdic["e"]
-        errback(["error", "conn_error", "connection failed"])
+        self.eback(["error", "conn_error", "connection to Last.fm API failed"])
+        Bus.publish(self, "error", ["conn_error", {"reason":reason, "status":self.status}])
             
             
 def make_ws_request(ctx, url, http_method="GET", postdata=None):
@@ -76,10 +73,11 @@ def make_ws_request(ctx, url, http_method="GET", postdata=None):
     @param http_method: HTTP method e.g. GET, POST
     """
     #Bus.publish(None, "log", "make_ws_request: http_method(%s) postdata(%s)" % (http_method, postdata))
+    headers={}
     if http_method=="POST":
-        reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata, headers={"Content-Type":"application/x-www-form-urlencoded"})) #@UndefinedVariable
-    else:
-        reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata)) #@UndefinedVariable
+        headers={"Content-Type":"application/x-www-form-urlencoded"}        
+
+    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata, headers=headers)) #@UndefinedVariable
 
 
 ## ============ Test ===============
