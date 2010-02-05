@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DBus API to Last.fm
+Comment=DBus API to http://last.fm/ web API
+Exec=dlastfmservice
+Icon=dlastfm
