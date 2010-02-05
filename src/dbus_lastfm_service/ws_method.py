@@ -139,7 +139,8 @@ class WsMethod(object):
         if self.method=="auth.getSession":
             dic["token"]=self.udic.get("auth_token", "MISSING_AUTH_TOKEN")
         else:
-            dic["sk"]=self.udic.get("token", "MISSING_SESSION_TOKEN")
+            if self.srequired:
+                dic["sk"]=self.udic.get("token", "MISSING_SESSION_TOKEN")
         
         dic["api_key"]=self.udic.get("api_key","")
         

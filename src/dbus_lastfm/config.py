@@ -1,7 +1,16 @@
 """
+    Configuration dialog
+
     @author: jldupont
 
     Created on 2010-02-04
+    
+    Bus/subscribes:
+        - user_params
+    Bus/publishes:
+        - user_params?
+        - user_params
+        - authorize
 """
 import os
 import gtk      #@UnresolvedImport
@@ -46,7 +55,11 @@ class Config:
                 value=params[param]
                 wgt=self.builder.get_object("e%s"%param)
                 wgt.set_text(value)
-            
+        
+        ## DBus API enable state
+        wgt=self.builder.get_object("cenable")                
+        state=params.get("dbus_enable", "False")
+        wgt.props.active=(state == "True")
                 
     ## ================================================ API
     def show(self):
@@ -58,6 +71,14 @@ class Config:
         self.window.hide()
 
     ## ================================================ Handlers
+    def on_cenable_toggled(self, wcenable):
+        """
+        DBus API enable checkbox
+        """
+        state=wcenable.props.active
+        Bus.publish(self, "user_params", {"dbus_enable": str(state)})
+        return True
+        
     def on_bapply_clicked(self, wbapply):
         self._publishParams()
         self._resetChanged()        
@@ -65,6 +86,7 @@ class Config:
         return True
     
     def on_bauth_clicked(self, wbauth):
+        Bus.publish(self, "authorize")
         return True
     
     def on_bclose_clicked(self, wbclose):

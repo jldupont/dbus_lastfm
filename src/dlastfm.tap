@@ -21,7 +21,7 @@ class BusLogger(object):
 ## ===========================
 from dbus_lastfm_service.mbus import Bus
 Bus.logger=BusLogger()
-Bus.debug=True
+#Bus.debug=True
 
 ## Initializes the modules
 ## =======================

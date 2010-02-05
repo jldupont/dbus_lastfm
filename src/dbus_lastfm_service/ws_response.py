@@ -68,6 +68,9 @@ class WsResponseHandler(object):
     def h_auth_gettoken(self, status, response_headers, cdic, udic, response):
         """
         Authentication flow
+        
+        Success:  ["ok",    url]
+        Failure:  ["error", error_code, error_msg]
         """
         Bus.publish(self, "log", "h_auth_gettoken, status: %s" % status)
         
@@ -90,6 +93,7 @@ class WsResponseHandler(object):
         api_key=udic.get("api_key", "")
         
         ## Return URL that must be used by the user for authentication
+        ## ===========================================================
         url=self.auth_url % (api_key, auth_token)
         cdic["c"](["ok", url])
 

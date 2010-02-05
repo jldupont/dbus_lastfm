@@ -28,6 +28,7 @@ class User(object):
             ,"secret_key"
             ,"auth_token"
             ,"token"
+            ,"dbus_enable"
             )
     
     ## Parameters that influence the validity

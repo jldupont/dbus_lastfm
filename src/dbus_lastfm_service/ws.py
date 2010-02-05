@@ -42,20 +42,21 @@ class WsFactory(HTTPClientFactory):
         """
         HTTPClientFactory.__init__(self, *p, agent=self.agent, **k)
         self.finished=False
-        (self.method, self.cdic, _) = ctx
-        self.eback=self.cdic["e"]
+        self._ctx=ctx
+        (self._amethod, self._cdic, _) = ctx
+        self.eback=self._cdic["e"]
         ##self.cback=self.cdic["c"]
         
     ## ==================================================  callbacks from WsProtocol
     def noPage(self, failure):
         if self.finished:
             return
-        self.finished=True        
-        self.eback(["error", "no_page", "no page for method(%s), HTTP status(%s)" % (self.method, self.status)])
-        Bus.publish(self, "error", ["api_access_error", {"status":self.status}])
+        self.finished=True
+        self.eback(["error", "no_page", "no page for method(%s)" % self.amethod])
+        #Bus.publish(self, "error", ["api_access_error", {}])
     
     def page(self, response):
-        if self.finished:
+        if self.finished: 
             return       
         self.finished=True
         Bus.publish(self, "ws_response", (self.status, self.response_headers, self._ctx, response))
@@ -73,12 +74,11 @@ def make_ws_request(ctx, url, http_method="GET", postdata=None):
     @param http_method: HTTP method e.g. GET, POST
     """
     #Bus.publish(None, "log", "make_ws_request: http_method(%s) postdata(%s)" % (http_method, postdata))
-    headers={}
     if http_method=="POST":
         headers={"Content-Type":"application/x-www-form-urlencoded"}        
-
-    reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata, headers=headers)) #@UndefinedVariable
-
+        reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method="POST", postdata=postdata, headers=headers)) #@UndefinedVariable
+    else:
+        reactor.connectTCP("ws.audioscrobbler.com", 80, WsFactory(ctx, str(url), method=http_method, postdata=postdata)) #@UndefinedVariable
 
 ## ============ Test ===============
 

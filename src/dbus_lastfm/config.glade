@@ -12,7 +12,46 @@
         <property name="border_width">5</property>
         <property name="orientation">vertical</property>
         <child>
-          <placeholder/>
+          <object class="GtkHBox" id="hbox2">
+            <property name="visible">True</property>
+            <child>
+              <object class="GtkAlignment" id="alignment4">
+                <property name="visible">True</property>
+                <property name="left_padding">15</property>
+                <child>
+                  <object class="GtkLabel" id="lenable">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">DBus API</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkAlignment" id="alignment5">
+                <property name="visible">True</property>
+                <property name="right_padding">15</property>
+                <child>
+                  <object class="GtkCheckButton" id="cenable">
+                    <property name="label" translatable="yes">Enabled</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="on_cenable_toggled"/>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="position">0</property>
+          </packing>
         </child>
         <child>
           <object class="GtkHBox" id="hbox1">

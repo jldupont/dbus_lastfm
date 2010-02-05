@@ -13,6 +13,8 @@ class UserMessenger(object):
     """
     _msgs={"api_access_error":"Error whilst accessing Last.FM web api. <br/>Is the service authentified?"
            ,"conn_error":"Connection error. <br/>Is Internet access functional?"
+           ,"auth_error":"Authorization error. <br/>Are the 'api_key' and 'secret_key' valid?"
+           ,"api_error":"Web API error. <br/>Has Last.fm's Web API changed?"
            ,"unknown":"Unknown error!"
            }
     
