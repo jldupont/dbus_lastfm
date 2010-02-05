@@ -41,10 +41,10 @@ Methods:
  - removeTag( String artist, String track, String tag )
 
  
-Dependency
-==========
+Dependencies
+============
 
 - `python-notify` Ubuntu package
 - GTK+
-- >= Python 2.6.x, < 3.0
+- Python >=2.6.x, < 3.0
   

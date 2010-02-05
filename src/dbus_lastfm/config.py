@@ -71,6 +71,13 @@ class Config:
         self.window.hide()
 
     ## ================================================ Handlers
+    def on_bexit_clicked(self, wbexit):
+        """
+        Exit the application
+        """
+        from twisted.internet import reactor
+        reactor.stop() #@UndefinedVariable
+        
     def on_cenable_toggled(self, wcenable):
         """
         DBus API enable checkbox

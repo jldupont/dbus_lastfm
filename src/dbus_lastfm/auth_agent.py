@@ -22,6 +22,9 @@ class AuthResponseAgent(object):
     def h_apicb(self, response):
         """
         API response callback
+        
+        If a valid 'url' is received, open a browser tab
+        for the user to 'authorize' the application
         """
         _status, url=response
         webbrowser.open_new_tab(url)
