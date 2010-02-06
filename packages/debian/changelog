@@ -1,5 +1,5 @@
-dbuslastfm (_VERSION_-5jldupont1~_DIST_1)  _DIST_; urgency=low
+dbuslastfm (_VERSION_-1jldupont1~_DIST_1)  _DIST_; urgency=low
 
-  * fixed twistd launch script (replaced ~ with $HOME)
+  * fixed start-up condition where user_params where missing
  
  -- Jean-Lou Dupont <jl@jldupont.com>  Sat, 06 Feb 2010 07:17:00 -0500

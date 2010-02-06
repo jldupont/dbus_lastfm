@@ -146,8 +146,15 @@ cfg=Config()
 Bus.subscribe("user_params", cfg.h_user_params)
 
 
+
 class App:
-    def __init__(self):
+
+    ICON_PATH="/usr/share/icons"
+    ICON_FILE="dlastfm.png"
+    
+    def __init__(self, curdir):
+        self.curdir=curdir
+        
         self._statusIcon=gtk.StatusIcon()
         self._statusIcon.set_from_stock(gtk.STOCK_ABOUT)
         self._statusIcon.set_visible(True)
@@ -155,12 +162,24 @@ class App:
         
         self._statusIcon.connect("activate", self._do_activate)
         
+        self.loadIcon()
+        
+    def loadIcon(self):
+        try:
+            ipath=self.ICON_PATH+"/"+self.ICON_FILE
+            pixbuf = gtk.gdk.pixbuf_new_from_file( ipath )
+        except:
+            ipath=self.curdir+"/"+self.ICON_FILE
+            pixbuf = gtk.gdk.pixbuf_new_from_file( ipath )
+            
+        scaled_buf = pixbuf.scale_simple(24,24,gtk.gdk.INTERP_BILINEAR)
+        self._statusIcon.set_from_pixbuf( scaled_buf )
+        
     def _do_activate(self, status_icon):
         cfg.show()
 
-app=App()
-
-
+basedir=os.path.abspath( os.path.dirname(__file__) + "/../" )
+app=App(basedir)
 
 def main():
     """
@@ -168,3 +187,6 @@ def main():
     """
     gtk.main()
 
+
+if __name__=="__main__":
+    main()

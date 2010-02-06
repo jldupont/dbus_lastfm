@@ -15,6 +15,8 @@ class DbusApiTrack(dbus.service.Object):
         bus_name = dbus.service.BusName('fm.lastfm.api', bus=dbus.SessionBus())
         dbus.service.Object.__init__(self, bus_name, '/track')
         self._cache={}
+        self._enable=False
+        Bus.publish(self, "user_params?")
         
     ## ================================================================ Bus interface
     def _snif_user_params(self, _, user_params):
