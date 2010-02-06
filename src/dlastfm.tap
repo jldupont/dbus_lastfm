@@ -3,12 +3,16 @@
 	
 	@author: Jean-Lou Dupont
 """
+import sys
 from dbus.mainloop.glib import DBusGMainLoop
 from twisted.application import internet, service
 from twisted.internet import reactor
 from twisted.python import log
 
 DBusGMainLoop(set_as_default=True)
+
+## Adjust path for install location
+sys.path.append("/usr/lib/dlastfm")
 
 application = service.Application('dlastfmservice')
 
@@ -26,7 +30,6 @@ Bus.logger=BusLogger()
 ## Initializes the modules
 ## =======================
 import dbus_lastfm_service.user
-#import dbus_lastfm_service.api
 import dbus_lastfm_service.api.account
 import dbus_lastfm_service.api.track
 import dbus_lastfm_service.logger

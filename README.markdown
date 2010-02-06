@@ -1,6 +1,11 @@
 Introduction
 ============
 
+This application offers a DBus API to Last.fm web service API (LFMWS).
+Since many of the "write" methods of the LFMWS required authentication,
+this application facilitates interfacing to Last.fm by provided a simple
+GUI for the user to provision the required parameters (username, api_key, secret_key)
+and launch a browser instance for performing the "authorization flow".
 
 Features
 ========
