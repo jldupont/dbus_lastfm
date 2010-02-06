@@ -1,3 +1,6 @@
 #!/bin/bash
 
-twistd -n -r glib2 -y dlastfm.tap
+@mkdir -p $HOME/.dlastfm
+
+cd /usr/bin
+twistd -l $HOME/.dlastfm/twistd.log --pidfile $HOME/.dlastfm/twistd.pid  -r glib2 -y dlastfm.tap
