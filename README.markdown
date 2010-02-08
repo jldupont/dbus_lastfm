@@ -56,4 +56,5 @@ Dependencies
 Installation
 ============
 
-A Debian package is available on my Launchpad PPA: https://launchpad.net/~jldupont/+archive/jldupont
+A Debian package is available on [my Launchpad PPA](https://launchpad.net/~jldupont/+archive/jldupont)
+
