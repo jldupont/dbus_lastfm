@@ -53,3 +53,7 @@ Dependencies
 - GTK+
 - Python >=2.6.x, < 3.0
   
+Installation
+============
+
+A Debian package is available on my Launchpad PPA: https://launchpad.net/~jldupont/+archive/jldupont
