@@ -49,6 +49,7 @@ Methods:
 Dependencies
 ============
 
+- Twisted
 - `python-notify` Ubuntu package
 - GTK+
 - Python >=2.6.x, < 3.0
