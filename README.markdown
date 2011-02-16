@@ -59,3 +59,8 @@ Installation
 
 A Debian package is available on [my Launchpad PPA](https://launchpad.net/~jldupont/+archive/jldupont)
 
+TODO
+====
+
+ - add "authentication status" GUI widget
+ 

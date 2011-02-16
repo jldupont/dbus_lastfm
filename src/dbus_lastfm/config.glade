@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
@@ -10,10 +10,10 @@
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
         <property name="border_width">5</property>
-        <property name="orientation">vertical</property>
         <child>
-          <object class="GtkHBox" id="hbox2">
+          <object class="GtkHBox" id="hboxDbusEnable">
             <property name="visible">True</property>
+            <property name="homogeneous">True</property>
             <child>
               <object class="GtkAlignment" id="alignment4">
                 <property name="visible">True</property>
@@ -54,7 +54,47 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox1">
+          <object class="GtkHBox" id="hboxAuthorized">
+            <property name="visible">True</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkAlignment" id="alignment6">
+                <property name="visible">True</property>
+                <property name="left_padding">15</property>
+                <child>
+                  <object class="GtkLabel" id="lAuthorized">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Authorized?</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkAlignment" id="alignment7">
+                <property name="visible">True</property>
+                <child>
+                  <object class="GtkCheckButton" id="cAuthorized">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="draw_indicator">True</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkHBox" id="hboxParameters">
             <property name="visible">True</property>
             <child>
               <object class="GtkAlignment" id="alignment1">
@@ -103,7 +143,7 @@
                   <object class="GtkEntry" id="eusername">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="invisible_char">●</property>
                     <signal name="changed" handler="on_eusername_changed"/>
                   </object>
                   <packing>
@@ -115,7 +155,7 @@
                   <object class="GtkEntry" id="eapi_key">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="invisible_char">●</property>
                     <signal name="changed" handler="on_eapi_key_changed"/>
                   </object>
                   <packing>
@@ -129,7 +169,7 @@
                   <object class="GtkEntry" id="esecret_key">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="invisible_char">&#x25CF;</property>
+                    <property name="invisible_char">●</property>
                     <signal name="changed" handler="on_esecret_key_changed"/>
                   </object>
                   <packing>
@@ -158,11 +198,11 @@
             </child>
           </object>
           <packing>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
-          <object class="GtkAlignment" id="alignment2">
+          <object class="GtkAlignment" id="aButtons">
             <property name="visible">True</property>
             <property name="top_padding">5</property>
             <property name="bottom_padding">5</property>
@@ -234,7 +274,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">2</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>
