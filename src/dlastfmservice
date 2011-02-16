@@ -2,5 +2,7 @@
 
 mkdir -p $HOME/.dlastfm
 
-cd /usr/bin
+if [ ! -z $1 ]; then
+	cd /usr/bin
+fi
 twistd -l $HOME/.dlastfm/twistd.log --pidfile $HOME/.dlastfm/twistd.pid  -r glib2 -y dlastfm.tap

@@ -78,8 +78,10 @@
                 <child>
                   <object class="GtkCheckButton" id="cAuthorized">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can_focus">False</property>
                     <property name="receives_default">False</property>
+                    <property name="focus_on_click">False</property>
                     <property name="draw_indicator">True</property>
                   </object>
                 </child>

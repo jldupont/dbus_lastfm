@@ -3,6 +3,7 @@
 	
 	@author: Jean-Lou Dupont
 """
+import os
 import sys
 from dbus.mainloop.glib import DBusGMainLoop
 from twisted.application import internet, service
@@ -11,8 +12,14 @@ from twisted.python import log
 
 DBusGMainLoop(set_as_default=True)
 
-## Adjust path for install location
-sys.path.append("/usr/lib/dlastfm")
+if "debug" in os.environ:
+	print "debug..."
+	cpath=os.path.dirname(__file__)
+	sys.path.insert(0, cpath)
+else:
+	print "normal..."
+	## Adjust path for install location
+	sys.path.append("/usr/lib/dlastfm")
 
 application = service.Application('dlastfmservice')
 
